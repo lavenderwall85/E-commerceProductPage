@@ -332,31 +332,31 @@
     font-size: 16px;
     cursor: pointer;
     border-radius: 5px;
-    background-color: #3498db; /* Color único para ambos botones */
+    background-color: #3498db; 
     color: white;
   }
 
   .cantidad button:hover {
-    background-color: #2980b9; /* Color más oscuro en hover */
+    background-color: #2980b9; 
   }
 
-  /* Estilos para la imagen seleccionada */
+  
   .image-container {
-    position: fixed; /* Esto asegura que se muestre por encima de todo */
+    position: fixed; 
     top: 0;
     left: 0;
-    width: 100vw; /* Ocupa todo el ancho de la pantalla */
-    height: 100vh; /* Ocupa toda la altura de la pantalla */
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo gris con transparencia */
-    display: flex; /* Usamos flexbox para centrar la imagen */
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    z-index: 100; /* Asegura que se superponga a otros elementos */
+    width: 100vw; 
+    height: 100vh; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 100; 
   }
 
   .image-container img {
-    max-width: 90%; /* Limita el tamaño máximo de la imagen */
-    max-height: 90%; /* Limita el tamaño máximo de la imagen */
-    object-fit: contain; /* Asegura que la imagen mantenga sus proporciones */
+    max-width: 90%; 
+    max-height: 90%;
+    object-fit: contain; 
   }
 </style>
