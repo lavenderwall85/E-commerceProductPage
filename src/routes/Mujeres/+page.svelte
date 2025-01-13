@@ -1,100 +1,133 @@
 <script>
-  // Lógica del menú
-  let carritoVisible = false;
-  let cuenta = false;
-  let selectedImage = null;
-  
+  import { writable } from 'svelte/store';
 
-  // logica lista productos
+  // Crear una store para los productos
+  const carrito = writable([
+    { id: 1, nombre: 'Running Sneakers', precio: 75.00, imagen: '/images/zapatosMujeres/modelo1.jpg', descripcion: 'Comfortable running shoes', cantidad: 0 },
+    { id: 2, nombre: 'Casual Sneakers', precio: 60.00, imagen: '/images/zapatosMujeres/modelo2.jpg', descripcion: 'Stylish casual shoes', cantidad: 0 },
+    { id: 3, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosMujeres/modelo3.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
+    { id: 4, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosMujeres/modelo4.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
+    { id: 5, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosMujeres/modelo5.jpg', descripcion: 'Trendy high-top design', cantidad: 0 }
+  ]);
 
-  let products = [
-    { id: 1, name: 'Running Sneakers', price: 75.00, image: '/images/zapatosMujeres/modelo1.jpg', description: 'Comfortable running shoes', added: false },
-    { id: 2, name: 'Casual Sneakers', price: 60.00, image: '/images/zapatosMujeres/modelo2.jpg', description: 'Stylish casual shoes', added: false },
-    { id: 3, name: 'High-Top Sneakers', price: 85.00, image: '/images/zapatosMujeres/modelo3.jpg', description: 'Trendy high-top design', added: false },
-    { id: 4, name: 'High-Top Sneakers', price: 85.00, image: '/images/zapatosMujeres/modelo4.jpg', description: 'Trendy high-top design', added: false },
-    { id: 5, name: 'High-Top Sneakers', price: 85.00, image: '/images/zapatosMujeres/modelo5.jpg', description: 'Trendy high-top design', added: false }
-  ];
-  
+  let menuAbierto = false;
+  let cuentaAbierta = false;
+  let imagenSeleccionada = null;
 
-  function toggleCarrito() {
-    carritoVisible = !carritoVisible;
+  function toggleMenu() {
+    menuAbierto = !menuAbierto;
   }
 
   function toggleCuenta() {
-    cuenta = !cuenta;
+    cuentaAbierta = !cuentaAbierta;
   }
 
-  function addToCart(product) {
-    product.added = !product.added;
+  function agregarAlCarrito(producto) {
+    carrito.update(items => {
+      const index = items.findIndex(item => item.id === producto.id);
+      if (index !== -1) {
+        items[index].cantidad = items[index].cantidad === 0 ? 1 : items[index].cantidad + 1;
+      }
+      return items;
+    });
   }
 
-  function selectImage(image) {
-    selectedImage = image; // Actualiza la imagen seleccionada
+  function seleccionarImagen(imagen) {
+    imagenSeleccionada = imagen;
+  }
+
+  function cambiarCantidad(producto, cantidad) {
+    if (cantidad >= 0) {
+      carrito.update(items => {
+        const index = items.findIndex(item => item.id === producto.id);
+        if (index !== -1) {
+          items[index].cantidad = cantidad;
+        }
+        return items;
+      });
+    }
   }
 </script>
 
 <nav class="menu">
   <div class="logo">sneakers</div>
   <ul class="menu-links">
-    <li><a href="#">Colecciones</a></li>
+    <li><a href="/Home">Colecciones</a></li>
     <li><a href="/Hombres">Hombres</a></li>
     <li><a href="/Mujeres">Mujeres</a></li>
     <li><a href="/AcercaDe">Acerca de</a></li>
     <li><a href="/Contacto">Contacto</a></li>
   </ul>
   <div class="menu-icons">
-    <span class="carrito" on:click={toggleCarrito}>🛒</span>
+    <span class="carrito" on:click={toggleMenu}>🛒</span>
     <span class="avatar" on:click={toggleCuenta}>👤</span>
   </div>
 </nav>
 
-{#if carritoVisible}
+{#if menuAbierto}
   <div class="cart">
-    <h1>Cart</h1>
-    <p>Tu carrito está vacío.</p>
-  </div>
-{/if}
-
-{#if cuenta}
-<div class="cuenta">
-  <span>Mi cuenta</span>
-  <span>Mis compras</span>
-  <span>Cerrar sesion</span>
-</div>
-{/if}
-
-{#if selectedImage}
-  <div class="image-container" on:click={() => selectedImage = null}>
-    <img src={selectedImage} alt="Selected Product" />
-  </div>
-{/if}
-
-  <div class="product-list">
-    {#each products as product}
-      <div class="product">
-        <div class="product-image" on:click={() => selectImage(product.image)}>
-          <img src={product.image} alt={product.name} />
+    <h1>Carrito</h1>
+    {#each $carrito as producto}
+      {#if producto.cantidad > 0}
+        <div class="producto-en-carrito">
+          <img src={producto.imagen} alt={producto.nombre} class="producto-img" />
+          <div class="producto-info">
+            <div class="producto-texto">
+              <p class="producto-nombre">{producto.nombre}</p>
+              <p class="producto-precio">${(producto.precio * producto.cantidad).toFixed(2)}</p>
+            </div>
+          </div>
         </div>
-        <button on:click={() => addToCart(product)}>
-          🛒 {product.added ? 'Added' : 'Add to Cart'}
-        </button>
-        <div class="product-info">
-          <p class="description">{product.description}</p>
-          <h2>{product.name}</h2>
-          <p class="price">${product.price.toFixed(2)}</p>
-        </div>
-      </div>
+      {/if}
     {/each}
   </div>
+{/if}
 
+{#if cuentaAbierta}
+  <div class="cuenta">
+    <span>Mi cuenta</span>
+    <span>Mis compras</span>
+    <span>Cerrar sesión</span>
+  </div>
+{/if}
 
+{#if imagenSeleccionada}
+  <div class="image-container" on:click={() => imagenSeleccionada = null}>
+    <img src={imagenSeleccionada} alt="Imagen seleccionada" />
+  </div>
+{/if}
+
+<div class="product-list">
+  {#each $carrito as producto}
+    <div class="product">
+      <div class="product-image" on:click={() => seleccionarImagen(producto.imagen)}>
+        <img src={producto.imagen} alt={producto.nombre} />
+      </div>
+      <div class="product-info">
+        <p class="descripcion">{producto.descripcion}</p>
+        <h2>{producto.nombre}</h2>
+        <p class="price">${producto.precio.toFixed(2)}</p>
+      </div>
+      <div class="product-actions">
+        <button on:click={() => agregarAlCarrito(producto)}>
+          🛒 {producto.cantidad > 0 ? 'Agregado' : 'Agregar al carrito'}
+        </button>
+        <div class="cantidad">
+          <button class="minus" on:click={() => { if (producto.cantidad > 0) cambiarCantidad(producto, producto.cantidad - 1); }}>-</button>
+          <span>{producto.cantidad}</span>
+          <button class="plus" on:click={() => cambiarCantidad(producto, producto.cantidad + 1)}>+</button>
+        </div>
+      </div>
+    </div>
+  {/each}
+</div>
 
 <style>
   :global(body){
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    overflow-y: auto;
+    background-color: #f9f9f9;
   }
 
   .menu {
@@ -127,8 +160,7 @@
     border-radius: 10px;
   }
 
-
-  .menu-links li a:hover{
+  .menu-links li a:hover {
     background: #d35400;
     color: #fcfbfb;
   }
@@ -138,6 +170,10 @@
     gap: 15px;
     font-size: 1.5em;
     cursor: pointer;
+  }
+
+  .carrito {
+    position: relative;
   }
 
   .cart {
@@ -150,6 +186,9 @@
     border-radius: 8px;
     padding: 15px;
     z-index: 10;
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
   }
 
   .cart h1 {
@@ -157,9 +196,38 @@
     margin: 0 0 10px;
   }
 
-  .cart p {
-    font-size: 1em;
-    color: #666;
+  .producto-en-carrito {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+  }
+
+  .producto-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  .producto-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .producto-texto {
+    flex-grow: 1;
+  }
+
+  .producto-nombre {
+    font-weight: bold;
+  }
+
+  .producto-precio {
+    color: #d35400;
+    font-weight: bold;
   }
 
   .cuenta {
@@ -177,7 +245,7 @@
     gap: 5px;
   }
 
-  .cuenta span{
+  .cuenta span {
     padding: 10px 0 10px 10px;
     color: #666;
     font-size: 0.9em;
@@ -185,10 +253,10 @@
     cursor: pointer;
   }
 
-  .cuenta span:hover{
+  .cuenta span:hover {
     background: #f4f5f9;
   }
-  /*lista de productos*/
+
   .product-list {
     display: flex;
     width: 100%;
@@ -196,11 +264,7 @@
     flex-wrap: wrap;
     gap: 30px;
     padding: 40px 0 40px 0;
-    background: #f9f9f9;
-    height: 100vh;
-    
   }
-
 
   .product {
     border: 1px solid #ddd;
@@ -208,70 +272,89 @@
     padding: 10px;
     background: #fff;
     width: 230px;
-    text-align: center;
     height: max-content;
-  } 
-  
+    text-align: center;
+  }
+
   .product-image img {
     width: 100%;
-    height: auto;
-    border-radius: 8px;
-    transition: transform 0.2s;
-  }
-  .product-image img:hover{
-    cursor: pointer;
-    transform: scale(1.1);
-
-  }
- 
-  .product-image img::hover button{
-    margin-top: 20px;
-  }
-
-  button {
-    margin: 10px 0;
-    padding: 5px 10px;
-    background: #ff7f50;
-    color: white;
-    border: none;
+    height: 160px;
+    object-fit: cover;
     border-radius: 5px;
     cursor: pointer;
   }
 
-  button:hover {
-    background: #e67348;
+  .product-info {
+    margin-top: 10px;
   }
 
-  .product-info p {
-    margin: 5px 0;
-  }
-
-  .description {
+  .descripcion {
     font-size: 0.9em;
-    color: #777;
+    color: #888;
   }
 
   .price {
-    font-size: 1.1em;
     color: #d35400;
+    font-weight: bold;
+    margin-top: 10px;
   }
 
+  .product-actions {
+    margin-top: 10px;
+  }
+
+  .product-actions button {
+    background-color: #d35400;
+    color: white;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .product-actions button:hover {
+    background-color: #c0392b;
+  }
+
+  .cantidad {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .cantidad button {
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #3498db; 
+    color: white;
+  }
+
+  .cantidad button:hover {
+    background-color: #2980b9; 
+  }
+
+  
   .image-container {
-    position: fixed;
+    position: fixed; 
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10; 
+    width: 100vw; 
+    height: 100vh; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 100; 
   }
 
   .image-container img {
-    max-width: 80%;
-    max-height: 80%;
-    border-radius: 8px;
+    max-width: 90%; 
+    max-height: 90%; 
+    object-fit: contain; 
   }
 </style>
