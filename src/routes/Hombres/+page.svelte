@@ -8,8 +8,8 @@
     { id: 3, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo3.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
     { id: 4, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo4.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
     { id: 5, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo5.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
-    { id: 6, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo6.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
-    { id: 7, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo7.jpg', descripcion: 'Trendy high-top design', cantidad: 0 }
+    { id: 5, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo6.jpg', descripcion: 'Trendy high-top design', cantidad: 0 },
+    { id: 5, nombre: 'High-Top Sneakers', precio: 85.00, imagen: '/images/zapatosHombres/modelo7.jpg', descripcion: 'Trendy high-top design', cantidad: 0 }
   ]);
 
   let menuAbierto = false;
@@ -49,6 +49,17 @@
       });
     }
   }
+
+  function eliminarProducto(producto) {
+    carrito.update(items => {
+      return items.map(item => {
+        if (item.id === producto.id) {
+          item.cantidad = 0; // Solo pone la cantidad en 0, no elimina el producto
+        }
+        return item;
+      });
+    });
+  }
 </script>
 
 <nav class="menu">
@@ -78,6 +89,7 @@
               <p class="producto-nombre">{producto.nombre}</p>
               <p class="producto-precio">${(producto.precio * producto.cantidad).toFixed(2)}</p>
             </div>
+            <button class="eliminar" on:click={() => eliminarProducto(producto)}>Eliminar</button>
           </div>
         </div>
       {/if}
@@ -232,6 +244,19 @@
     font-weight: bold;
   }
 
+  .eliminar {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .eliminar:hover {
+    background-color: #c0392b;
+  }
+
   .cuenta {
     position: absolute;
     top: 60px;
@@ -277,15 +302,20 @@
     height: max-content;
     text-align: center;
   }
-
+  .product-image{
+    overflow: hidden;
+  }
   .product-image img {
     width: 100%;
     height: 160px;
     object-fit: cover;
     border-radius: 5px;
     cursor: pointer;
+    transition: transform 0.3s ease-in-out;
   }
-
+  .product-image img:hover{
+    transform: scale(1.2);
+  }
   .product-info {
     margin-top: 10px;
   }
@@ -340,7 +370,6 @@
     background-color: #2980b9; 
   }
 
-  
   .image-container {
     position: fixed; 
     top: 0;

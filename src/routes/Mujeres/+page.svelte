@@ -47,6 +47,17 @@
       });
     }
   }
+
+  function eliminarProducto(producto) {
+    carrito.update(items => {
+      return items.map(item => {
+        if (item.id === producto.id) {
+          item.cantidad = 0;
+        }
+        return item;
+      });
+    });
+  }
 </script>
 
 <nav class="menu">
@@ -76,6 +87,7 @@
               <p class="producto-nombre">{producto.nombre}</p>
               <p class="producto-precio">${(producto.precio * producto.cantidad).toFixed(2)}</p>
             </div>
+            <button class="eliminar" on:click={() => eliminarProducto(producto)}>Eliminar</button>
           </div>
         </div>
       {/if}
@@ -230,6 +242,19 @@
     font-weight: bold;
   }
 
+  .eliminar {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .eliminar:hover {
+    background-color: #c0392b;
+  }
+
   .cuenta {
     position: absolute;
     top: 60px;
@@ -266,22 +291,19 @@
     padding: 40px 0 40px 0;
   }
 
-  .product {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    background: #fff;
-    width: 230px;
-    height: max-content;
-    text-align: center;
+  .product-image{
+    overflow: hidden;
   }
-
   .product-image img {
     width: 100%;
     height: 160px;
     object-fit: cover;
     border-radius: 5px;
     cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+  }
+  .product-image img:hover{
+    transform: scale(1.2);
   }
 
   .product-info {
@@ -338,7 +360,6 @@
     background-color: #2980b9; 
   }
 
-  
   .image-container {
     position: fixed; 
     top: 0;
