@@ -1,7 +1,6 @@
 <script>
   import { writable } from 'svelte/store';
 
-  // Crear una store para los productos
   const carrito = writable([
     { id: 1, nombre: 'Running Sneakers', precio: 75.00, imagen: '/images/zapatosMujeres/modelo1.jpg', descripcion: 'Comfortable running shoes', cantidad: 0 },
     { id: 2, nombre: 'Casual Sneakers', precio: 60.00, imagen: '/images/zapatosMujeres/modelo2.jpg', descripcion: 'Stylish casual shoes', cantidad: 0 },
@@ -13,6 +12,8 @@
   let menuAbierto = false;
   let cuentaAbierta = false;
   let imagenSeleccionada = null;
+  let modalAbierto = false;
+  let total = 0;
 
   function toggleMenu() {
     menuAbierto = !menuAbierto;
@@ -58,10 +59,22 @@
       });
     });
   }
+
+  function pagar() {
+    carrito.subscribe(items => {
+      total = items.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+    })();
+    modalAbierto = true;
+  }
+
+  function cerrarModal() {
+    modalAbierto = false;
+    carrito.update(items => items.map(item => ({ ...item, cantidad: 0 }))); 
+  }
 </script>
 
 <nav class="menu">
-  <div class="logo">sneakers</div>
+  <div class="logo">Sneakers</div>
   <ul class="menu-links">
     <li><a href="/Home">Colecciones</a></li>
     <li><a href="/Hombres">Hombres</a></li>
@@ -92,6 +105,9 @@
         </div>
       {/if}
     {/each}
+    {#if $carrito.some(producto => producto.cantidad > 0)}
+      <button class="pagar" on:click={pagar}>Pagar</button>
+    {/if}
   </div>
 {/if}
 
@@ -106,6 +122,16 @@
 {#if imagenSeleccionada}
   <div class="image-container" on:click={() => imagenSeleccionada = null}>
     <img src={imagenSeleccionada} alt="Imagen seleccionada" />
+  </div>
+{/if}
+
+{#if modalAbierto}
+  <div class="modal-overlay" on:click={cerrarModal}>
+    <div class="modal" on:click|stopPropagation>
+      <h2>Confirmación de pago</h2>
+      <p>Total a pagar: ${total.toFixed(2)}</p>
+      <button on:click={cerrarModal}>Cerrar</button>
+    </div>
   </div>
 {/if}
 
@@ -254,7 +280,19 @@
   .eliminar:hover {
     background-color: #c0392b;
   }
+.cart .pagar{
+  margin-top: 10px;
+    padding: 10px 20px;
+    background: #d35400;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
+.cart .pagar:hover{
+  background: #c0392b;
+}
   .cuenta {
     position: absolute;
     top: 60px;
@@ -281,7 +319,6 @@
   .cuenta span:hover {
     background: #f4f5f9;
   }
-
   .product-list {
     display: flex;
     width: 100%;
@@ -291,6 +328,15 @@
     padding: 40px 0 40px 0;
   }
 
+  .product {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+    width: 230px;
+    height: max-content;
+    text-align: center;
+  }
   .product-image{
     overflow: hidden;
   }
@@ -305,7 +351,6 @@
   .product-image img:hover{
     transform: scale(1.2);
   }
-
   .product-info {
     margin-top: 10px;
   }
@@ -360,6 +405,10 @@
     background-color: #2980b9; 
   }
 
+  .cantidad button:hover {
+    background-color: #2980b9; 
+  }
+
   .image-container {
     position: fixed; 
     top: 0;
@@ -377,5 +426,37 @@
     max-width: 90%; 
     max-height: 90%; 
     object-fit: contain; 
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  .modal button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #d35400;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .modal button:hover {
+    background: #c0392b;
   }
 </style>
